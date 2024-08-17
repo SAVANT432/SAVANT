@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+    <title>Hospital Patient Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #responseMessage {
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: center;
+        }
+    </style>
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Patient Information Form</h1>
+        <form id="patientForm">
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" name="fullName" required>
+
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender" required>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+
+            <label for="contactNumber">Contact Number:</label>
+            <input type="tel" id="contactNumber" name="contactNumber" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required></textarea>
+
+            <label for="medicalHistory">Medical History (if any):</label>
+            <textarea id="medicalHistory" name="medicalHistory"></textarea>
+
+            <button type="submit">Submit</button>
+        </form>
+        <div id="responseMessage"></div>
+    </div>
+    <script>
+        document.getElementById('patientForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const fullName = document.getElementById('fullName').value;
+            const dob = document.getElementById('dob').value;
+            const gender = document.getElementById('gender').value;
+            const contactNumber = document.getElementById('contactNumber').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const medicalHistory = document.getElementById('medicalHistory').value;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Adding hospital header
+            doc.setFontSize(18);
+            doc.text('Hospital Name', 105, 15, { align: 'center' });
+
+            // Adding patient information
+            doc.setFontSize(16);
+            doc.text('Patient Information Form', 105, 30, { align: 'center' });
+
+            doc.setFontSize(12);
+            
+            // First row: Name & Visit Date
+            doc.text('Full Name:', 20, 50);
+            doc.text(fullName, 60, 50);
+            doc.text('Visit Date:', 120, 50);
+            doc.text(new Date().toLocaleDateString(), 170, 50);
+
+            // Second row: Date of Birth & Gender
+            doc.text('Date of Birth:', 20, 70);
+            doc.text(dob, 60, 70);
+            doc.text('Gender:', 120, 70);
+            doc.text(gender, 170, 70);
+
+            // Third row: Contact Number & Address
+            doc.text('Contact Number:', 20, 90);
+            doc.text(contactNumber, 60, 90);
+            doc.text('Address:', 120, 90);
+            doc.text(address, 120, 105, { maxWidth: 80 });
+
+            // Fourth row: Medical History
+            doc.text('Medical History:', 20, 125);
+            doc.text(medicalHistory || 'None', 20, 140, { maxWidth: 170 });
+
+            // Adding footer
+            doc.setFontSize(10);
+            doc.text('This document is a confidential hospital record.', 105, 275, { align: 'center' });
+
+            // Save the PDF
+            doc.save('patient_info.pdf');
+
+            // Update response message
+            document.getElementById('responseMessage').innerText = `Thank you, ${fullName}. Your information has been received and saved as a PDF.`;
+
+            // Clear the form fields
+            document.getElementById('patientForm').reset();
+        });
+    </script>
+</body>
+</html>
